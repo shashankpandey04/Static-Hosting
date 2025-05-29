@@ -1,18 +1,15 @@
 import os
+import json
 import shutil
+# import tempfile (removed as it is unused)
 import datetime
 from flask import Flask, request, send_from_directory, abort, render_template, jsonify, redirect, session
 import zipfile
 from dotenv import load_dotenv
+# import requests (removed as it is unused)
 import git
+# from werkzeug.utils import secure_filename (removed as it is unused)
 import logging
-from pymongo import MongoClient
-from bson import ObjectId
-import time
-import stat
-import os.path
-from ctypes import windll, c_uint32  # For Windows-specific deletion workaround
-from github_helper import clone_github_repo_via_zip
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -25,65 +22,53 @@ SITE_FOLDER = 'user_sites'
 GITHUB_FOLDER = 'github_repos'
 ADMIN_TOKEN = os.getenv("ADMIN_TOKEN", "super_secret_token")
 
-# MongoDB configuration
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
-DB_NAME = os.getenv("DB_NAME", "foundev_hosting")
-
 # Create necessary directories
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(SITE_FOLDER, exist_ok=True)
 os.makedirs(GITHUB_FOLDER, exist_ok=True)
 os.makedirs(os.path.join(GITHUB_FOLDER, 'temp'), exist_ok=True)
 
+# Data storage (in a production app, this would be a database)
+SITES_DB_FILE = 'sites_db.json'
+ACTIVITY_DB_FILE = 'activity_db.json'
+
 # Initialize app
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.secret_key = os.getenv("SECRET_KEY", "super_secret_key_for_sessions")
 
-# Initialize MongoDB connection
-mongo_client = MongoClient(MONGO_URI)
-db = mongo_client[DB_NAME]
-sites_collection = db['sites']
-activities_collection = db['activities']
+# Helper function to load sites database
+def load_sites_db():
+    if os.path.exists(SITES_DB_FILE):
+        with open(SITES_DB_FILE, 'r') as f:
+            return json.load(f)
+    return {'sites': []}
 
-# Helper function to get all sites
-def get_all_sites():
-    return list(sites_collection.find())
-
-# Helper function to get a site by domain
-def get_site_by_domain(domain):
-    return sites_collection.find_one({'domain': domain})
-
-# Helper function to insert or update a site
-def upsert_site(domain, data):
-    return sites_collection.update_one(
-        {'domain': domain},
-        {'$set': data},
-        upsert=True
-    )
-
-# Helper function to delete a site
-def delete_site_from_db(domain):
-    return sites_collection.delete_one({'domain': domain})
+# Helper function to save sites database
+def save_sites_db(db):
+    with open(SITES_DB_FILE, 'w') as f:
+        json.dump(db, f)
 
 # Helper function to add activity
 def add_activity(site, type_activity, status):
-    activity = {
+    if os.path.exists(ACTIVITY_DB_FILE):
+        with open(ACTIVITY_DB_FILE, 'r') as f:
+            activities = json.load(f)
+    else:
+        activities = {'activities': []}
+    
+    activities['activities'].append({
         'site': site,
         'type': type_activity,
-        'date': datetime.datetime.now().isoformat(),
+        'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         'status': status
-    }
+    })
     
-    activities_collection.insert_one(activity)
+    # Limit to 50 recent activities
+    if len(activities['activities']) > 50:
+        activities['activities'] = activities['activities'][-50:]
     
-    # Keep only the latest 50 activities
-    total = activities_collection.count_documents({})
-    if total > 50:
-        # Get the oldest activities to remove
-        to_delete = total - 50
-        oldest = activities_collection.find().sort('date', 1).limit(to_delete)
-        oldest_ids = [doc['_id'] for doc in oldest]
-        activities_collection.delete_many({'_id': {'$in': oldest_ids}})
+    with open(ACTIVITY_DB_FILE, 'w') as f:
+        json.dump(activities, f)
 
 # Authentication middleware
 from functools import wraps
@@ -137,46 +122,44 @@ def dashboard():
 @app.route('/api/dashboard')
 @admin_required
 def get_dashboard_data():
-    sites = list(sites_collection.find())
+    sites_db = load_sites_db()
+    sites = sites_db.get('sites', [])
     
     github_deployments = sum(1 for site in sites if site.get('type') == 'github')
     zip_uploads = sum(1 for site in sites if site.get('type') == 'zip')
     
     # Get recent activities
-    recent_activities = list(activities_collection.find().sort('date', -1).limit(5))
-    
-    # Convert ObjectId to string for JSON serialization
-    for activity in recent_activities:
-        activity['_id'] = str(activity['_id'])
+    activities = []
+    if os.path.exists(ACTIVITY_DB_FILE):
+        with open(ACTIVITY_DB_FILE, 'r') as f:
+            activity_data = json.load(f)
+            activities = activity_data.get('activities', [])[-5:]  # Get the 10 most recent
     
     return jsonify({
         'total_sites': len(sites),
         'github_deployments': github_deployments,
         'zip_uploads': zip_uploads,
-        'recent_activity': recent_activities
+        'recent_activity': activities
     })
 
 # Get all sites
 @app.route('/api/sites')
 @admin_required
 def get_sites():
-    sites = list(sites_collection.find())
-    
-    # Convert ObjectId to string for JSON serialization
-    for site in sites:
-        site['_id'] = str(site['_id'])
-    
-    return jsonify({'sites': sites})
+    sites_db = load_sites_db()
+    return jsonify(sites_db)
 
 # Delete a site
 @app.route('/api/site/<domain>', methods=['DELETE'])
 @admin_required
 def delete_site(domain):
+    sites_db = load_sites_db()
     folder_name = domain.replace('.', '_')
     site_path = os.path.join(SITE_FOLDER, folder_name)
     
-    # Remove from database
-    result = delete_site_from_db(domain)
+    # Remove from sites list
+    sites_db['sites'] = [site for site in sites_db['sites'] if site.get('domain') != domain]
+    save_sites_db(sites_db)
     
     # Remove site files
     if os.path.exists(site_path):
@@ -194,12 +177,8 @@ def delete_site(domain):
 @app.route('/api/github-sites')
 @admin_required
 def get_github_sites():
-    github_sites = list(sites_collection.find({'type': 'github'}))
-    
-    # Convert ObjectId to string for JSON serialization
-    for site in github_sites:
-        site['_id'] = str(site['_id'])
-    
+    sites_db = load_sites_db()
+    github_sites = [site for site in sites_db.get('sites', []) if site.get('type') == 'github']
     return jsonify({'sites': github_sites})
 
 # Deploy from GitHub
@@ -226,26 +205,11 @@ def github_deploy():
         # Clean up any existing temporary repository directory first
         if os.path.exists(temp_repo_path):
             logger.info(f"Removing existing temporary repository directory: {temp_repo_path}")
-            safe_rmtree(temp_repo_path)
-            
-            # Verify the directory is gone
-            if os.path.exists(temp_repo_path):
-                logger.warning(f"Directory still exists after cleanup, creating a new temp path")
-                # Create a new temp path with timestamp if we couldn't remove the old one
-                timestamp = int(time.time())
-                temp_repo_path = os.path.join(GITHUB_FOLDER, 'temp', f"{folder_name}_{timestamp}")
-                os.makedirs(temp_repo_path, exist_ok=True)
+            shutil.rmtree(temp_repo_path)
         
-        # Clone the repository with explicit garbage collection to reduce file locking
+        # Clone the repository - had to remove the double cloning that was happening before
         logger.info(f"Cloning repository {repo_url} (branch {branch}) to {temp_repo_path}")
-        
-        # Use environment variables to configure git to avoid file locking
-        git_env = os.environ.copy()
-        git_env["GIT_TERMINAL_PROMPT"] = "0"  # Disable prompting
-        git_env["GIT_FLUSH"] = "1"  # Flush more aggressively
-        
-        # Use our GitHub helper to download via ZIP API
-        clone_github_repo_via_zip(repo_url, branch, temp_repo_path)
+        repo = git.Repo.clone_from(repo_url, temp_repo_path, branch=branch)
         
         # If a specific directory is specified, copy from there
         source_dir = os.path.join(temp_repo_path, directory) if directory else temp_repo_path
@@ -258,56 +222,45 @@ def github_deploy():
         for item in os.listdir(site_path):
             item_path = os.path.join(site_path, item)
             if os.path.isdir(item_path):
-                safe_rmtree(item_path)
+                shutil.rmtree(item_path)
             else:
-                try:
-                    os.remove(item_path)
-                except Exception as e:
-                    logger.warning(f"Failed to delete file {item_path}: {str(e)}")
+                os.remove(item_path)
         
         # Copy files from repository to site directory
         logger.info(f"Copying files from {source_dir} to {site_path}")
-        files_copied = 0
         for item in os.listdir(source_dir):
-            if item == '.git':  # Skip .git directory
-                continue
-                
             src = os.path.join(source_dir, item)
             dst = os.path.join(site_path, item)
-            
-            try:
-                if os.path.isdir(src):
-                    shutil.copytree(src, dst)
-                else:
-                    shutil.copy2(src, dst)
-                files_copied += 1
-            except Exception as e:
-                logger.warning(f"Error copying {src} to {dst}: {str(e)}")
+            if item == '.git':  # Skip .git directory
+                continue
+            if os.path.isdir(src):
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy2(src, dst)
         
-        logger.info(f"Copied {files_copied} files/directories to {site_path}")
+        # Update sites database
+        sites_db = load_sites_db()
+        existing_site = next((site for site in sites_db.get('sites', []) if site.get('domain') == domain), None)
         
-        # Release repo resources to avoid file locking
-        if 'repo' in locals():
-            repo.git.clear_cache()
-            repo.close()
-            del repo
+        if existing_site:
+            existing_site.update({
+                'repo_url': repo_url,
+                'branch': branch,
+                'directory': directory,
+                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        else:
+            sites_db.setdefault('sites', []).append({
+                'domain': domain,
+                'type': 'github',
+                'repo_url': repo_url,
+                'branch': branch,
+                'directory': directory,
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
         
-        # Update site in database
-        now = datetime.datetime.now().isoformat()
-        site_data = {
-            'domain': domain,
-            'type': 'github',
-            'repo_url': repo_url,
-            'branch': branch,
-            'directory': directory,
-            'updated_at': now
-        }
-        
-        existing_site = get_site_by_domain(domain)
-        if not existing_site:
-            site_data['created_at'] = now
-            
-        upsert_site(domain, site_data)
+        save_sites_db(sites_db)
         add_activity(domain, 'github-deploy', 'success')
         
         return jsonify({'success': True, 'message': f'Site {domain} deployed successfully from GitHub'})
@@ -317,20 +270,11 @@ def github_deploy():
         add_activity(domain, 'github-deploy', 'failed')
         return jsonify({'success': False, 'message': f'Error deploying from GitHub: {str(e)}'}), 500
     finally:
-        # Clean up - try to remove the temp directory with our safe method
+        # Clean up
         if os.path.exists(temp_repo_path):
             try:
                 logger.info(f"Cleaning up temporary repository directory: {temp_repo_path}")
-                # Force Python's garbage collection to release any file handles
-                import gc
-                gc.collect()
-                
-                # Wait a moment for any file handles to be released
-                time.sleep(1)
-                
-                # Try to delete the directory
-                safe_rmtree(temp_repo_path)
-                
+                shutil.rmtree(temp_repo_path)
             except Exception as cleanup_error:
                 logger.warning(f"Failed to clean up temporary repository: {str(cleanup_error)}")
 
@@ -338,9 +282,10 @@ def github_deploy():
 @app.route('/api/github-deploy/<domain>', methods=['POST'])
 @admin_required
 def redeploy_github_site(domain):
-    site = get_site_by_domain(domain)
+    sites_db = load_sites_db()
+    site = next((site for site in sites_db.get('sites', []) if site.get('domain') == domain and site.get('type') == 'github'), None)
     
-    if not site or site.get('type') != 'github':
+    if not site:
         return jsonify({'success': False, 'message': 'GitHub site not found'}), 404
     
     # Create a request body with the site's existing configuration
@@ -414,19 +359,23 @@ def upload_zip():
                 # No common root or multiple roots, extract directly
                 zip_ref.extractall(site_path)
         
-        # Update site in database
-        now = datetime.datetime.now().isoformat()
-        site_data = {
-            'domain': domain,
-            'type': 'zip',
-            'updated_at': now
-        }
+        # Update sites database
+        sites_db = load_sites_db()
+        existing_site = next((site for site in sites_db.get('sites', []) if site.get('domain') == domain), None)
         
-        existing_site = get_site_by_domain(domain)
-        if not existing_site:
-            site_data['created_at'] = now
-            
-        upsert_site(domain, site_data)
+        if existing_site:
+            existing_site.update({
+                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        else:
+            sites_db.setdefault('sites', []).append({
+                'domain': domain,
+                'type': 'zip',
+                'created_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                'updated_at': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            })
+        
+        save_sites_db(sites_db)
         add_activity(domain, 'zip-upload', 'success')
                 
         # Clean up the temporary zip file
@@ -490,16 +439,9 @@ def serve_static_by_path(folder_name, path):
 @app.route('/debug/sites')
 def debug_sites():
     try:
-        # Get sites from filesystem
-        fs_sites = os.listdir(SITE_FOLDER)
-        
-        # Get sites from database
-        db_sites = list(sites_collection.find({}, {'_id': 0, 'domain': 1}))
-        db_site_domains = [site['domain'] for site in db_sites]
-        
+        sites = os.listdir(SITE_FOLDER)
         return {
-            'filesystem_sites': fs_sites,
-            'database_sites': db_site_domains,
+            'sites': sites,
             'site_folder': os.path.abspath(SITE_FOLDER),
             'exists': os.path.exists(SITE_FOLDER),
             'is_dir': os.path.isdir(SITE_FOLDER)
@@ -553,99 +495,6 @@ def serve_static(path):
             return send_from_directory(site_path, index_path)
     return abort(404)
 
-# Route to handle 404 errors with our custom template
-@app.errorhandler(404)
-def page_not_found(e):
-    return render_template('404.html'), 404
-
-# Added helper function to handle read-only files during deletion
-def remove_readonly(func, path, excinfo):
-    """
-    Error handler for `shutil.rmtree` to handle read-only files.
-    Make the file writable and try again.
-    """
-    logger.info(f"Trying to handle read-only file: {path}")
-    os.chmod(path, stat.S_IWRITE)
-    func(path)
-
-# Helper function for Windows to force delete stubborn files
-def force_delete_windows(path):
-    """
-    Use Windows API to force delete a file even if locked by another process.
-    Returns True if successful, False otherwise.
-    """
-    try:
-        logger.info(f"Attempting forced delete of: {path}")
-        # Convert path to absolute for the Windows API
-        abs_path = os.path.abspath(path)
-        # Convert forward slashes to backslashes for Windows API
-        path_for_win = abs_path.replace('/', '\\')
-        # Use MoveFileExW with MOVEFILE_DELAY_UNTIL_REBOOT flag (4)
-        result = windll.kernel32.MoveFileExW(path_for_win, None, c_uint32(4))
-        if result == 0:  # If failed, get the error code
-            error_code = windll.kernel32.GetLastError()
-            logger.warning(f"Forced delete failed with error code: {error_code}")
-            return False
-        return True
-    except Exception as e:
-        logger.warning(f"Exception during forced delete: {str(e)}")
-        return False
-
-# Safe recursive deletion with retry mechanism
-def safe_rmtree(path, max_retries=3, delay=1):
-    """
-    Safely remove a directory and all its contents with retry mechanism.
-    
-    Args:
-        path: Directory path to remove
-        max_retries: Maximum number of retry attempts
-        delay: Delay between retries in seconds
-    """
-    if not os.path.exists(path):
-        logger.info(f"Path doesn't exist, nothing to delete: {path}")
-        return
-        
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"Removing directory (attempt {attempt+1}): {path}")
-            shutil.rmtree(path, onerror=remove_readonly)
-            logger.info(f"Successfully removed directory: {path}")
-            return
-        except Exception as e:
-            logger.warning(f"Failed to remove directory (attempt {attempt+1}): {path}, error: {str(e)}")
-            
-            # Try to remove problematic Git files individually
-            if '.git' in path:
-                try:
-                    for root, dirs, files in os.walk(path):
-                        for file in files:
-                            if file.endswith('.idx') or file.endswith('.pack'):
-                                file_path = os.path.join(root, file)
-                                try:
-                                    os.chmod(file_path, stat.S_IWRITE)
-                                    os.unlink(file_path)
-                                except:
-                                    force_delete_windows(file_path)
-                except Exception as inner_e:
-                    logger.warning(f"Error handling Git files: {str(inner_e)}")
-            
-            # Wait before retrying
-            if attempt < max_retries - 1:
-                time.sleep(delay)
-    
-    # If we get here, all retries failed
-    logger.error(f"Failed to remove directory after {max_retries} attempts: {path}")
-    
-    # Last resort: try to schedule deletion on reboot for Windows
-    try:
-        force_delete_windows(path)
-    except Exception as e:
-        logger.error(f"Failed to schedule deletion on reboot: {str(e)}")
-
 if __name__ == '__main__':
-    # Initialize database with indexes if needed
-    sites_collection.create_index('domain', unique=True)
-    activities_collection.create_index('date')
-    
     # Make sure to run with debug=True to see detailed error messages
     app.run(debug=True, port=80, host='0.0.0.0')
