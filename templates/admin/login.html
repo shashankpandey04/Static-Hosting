@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | FounDev Studio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            300: '#cbd5e1',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            600: '#475569',
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        accent: {
+                            400: '#34d399',
+                            500: '#10b981',
+                            600: '#059669',
+                        },
+                        dark: {
+                            50: '#18181b',
+                            100: '#09090b',
+                        }
+                    },
+                    fontFamily: {
+                        'geist': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.6s ease-out',
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-glow': 'pulseGlow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        pulseGlow: {
+                            '0%': { boxShadow: '0 0 20px rgba(16, 185, 129, 0.3)' },
+                            '100%': { boxShadow: '0 0 40px rgba(16, 185, 129, 0.6)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+        
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            font-feature-settings: 'cv11', 'ss01';
+            font-variation-settings: 'opsz' 32;
+        }
+
+        .noise {
+            position: relative;
+        }
+        
+        .noise::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.03;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
+            background-size: 20px 20px;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body class="bg-dark-100 min-h-screen relative overflow-hidden font-geist antialiased" style="background-color: #09090b;">
+
+    <!-- Animated background elements -->
+    <div class="absolute inset-0 noise"></div>
+    
+    <!-- Floating orbs -->
+    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-accent-500/10 rounded-full blur-3xl animate-float"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-primary-600/10 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl animate-float" style="animation-delay: -1.5s;"></div>
+
+    <!-- Main content -->
+    <div class="relative z-10 min-h-screen flex items-center justify-center p-4">
+        <div class="w-full max-w-md animate-slide-up">
+            <!-- Logo section -->
+            <div class="text-center mb-8">
+                <div class="relative inline-block">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-accent-400 to-accent-600 rounded-2xl flex items-center justify-center shadow-2xl animate-pulse-glow">
+                        <i class="fas fa-cloud text-white text-2xl"></i>
+                    </div>
+                    <div class="absolute -inset-2 bg-gradient-to-r from-accent-400 to-accent-600 rounded-2xl blur opacity-30 animate-pulse"></div>
+                </div>
+                <h1 class="text-3xl font-bold text-white mb-2 tracking-tight">
+                    Admin Portal
+                </h1>
+                <p class="text-slate-400 text-sm font-medium">
+                    Secure access to CloudSpark admin dashboard
+                </p>
+            </div>
+
+            <!-- Login form -->
+            <div class="relative">
+                <!-- Glass morphism container -->
+                <div class="absolute inset-0 bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10"></div>
+                <div class="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent rounded-3xl"></div>
+                
+                <div class="relative z-10 p-8">
+                    <form id="login-form" class="space-y-6" action="/admin/authenticate" method="POST">
+                        <input type="hidden" name="remember" value="true">
+                        
+                        <!-- Token input -->
+                        <div class="space-y-2">
+                            <label for="token" class="block text-sm font-semibold text-slate-200">
+                                Access Token
+                            </label>
+                            <div class="relative group">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                                    <i class="fas fa-key text-slate-500 text-sm"></i>
+                                </div>
+                                <input 
+                                    id="token" 
+                                    name="token" 
+                                    type="password" 
+                                    required 
+                                    class="w-full h-14 pl-12 pr-12 bg-dark-50/50 border border-slate-700/50 rounded-2xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 transition-all duration-300 backdrop-blur-sm text-sm font-medium" 
+                                    placeholder="Enter your secure access token"
+                                >
+                                <div id="togglePassword" class="absolute inset-y-0 right-0 pr-4 flex items-center cursor-pointer z-10 group">
+                                    <i class="fas fa-eye text-slate-500 group-hover:text-slate-300 transition-colors text-sm"></i>
+                                </div>
+                                <!-- Focus ring -->
+                                <div class="absolute inset-0 rounded-2xl ring-2 ring-accent-500/0 group-focus-within:ring-accent-500/20 transition-all duration-300 pointer-events-none"></div>
+                            </div>
+                        </div>
+
+                        <!-- Error message -->
+                        <div id="error-message" class="hidden">
+                            <div class="bg-red-500/10 backdrop-blur-sm text-red-400 p-4 rounded-2xl border border-red-500/20 text-sm font-medium">
+                                <div class="flex items-center">
+                                    <i class="fas fa-triangle-exclamation mr-3 text-red-400"></i>
+                                    <span>Invalid token. Please check and try again.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit button -->
+                        <div class="pt-2">
+                            <button 
+                                type="submit" 
+                                class="group relative w-full h-14 bg-gradient-to-r from-accent-500 to-accent-600 hover:from-accent-400 hover:to-accent-500 text-white font-semibold rounded-2xl transition-all duration-300 shadow-lg shadow-accent-500/25 hover:shadow-accent-500/40 hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-accent-500/50 focus:ring-offset-2 focus:ring-offset-dark-100"
+                            >
+                                <span id="btn-text" class="flex items-center justify-center">
+                                    Access Dashboard
+                                    <i class="fas fa-arrow-right ml-3 text-sm group-hover:translate-x-1 transition-transform duration-300"></i>
+                                </span>
+                            </button>
+                        </div>
+                        
+                        <!-- Return link -->
+                        <div class="pt-4 text-center">
+                            <a href="/" class="inline-flex items-center text-slate-400 hover:text-accent-400 text-sm font-medium transition-colors duration-200 group">
+                                <i class="fas fa-arrow-left mr-2 text-xs group-hover:-translate-x-1 transition-transform duration-200"></i>
+                                Return to homepage
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const token = document.getElementById('token');
+            const icon = this.querySelector('i');
+            
+            if (token.type === 'password') {
+                token.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                token.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        
+        // Form submission
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const token = document.getElementById('token').value;
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.classList.add('hidden');
+            
+            // Show loading state
+            const button = this.querySelector('button[type="submit"]');
+            const btnText = document.getElementById('btn-text');
+            const originalText = btnText.innerHTML;
+            btnText.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-3"></i> Authenticating...';
+            button.disabled = true;
+            button.classList.add('opacity-75', 'cursor-not-allowed');
+            
+            fetch('/admin/authenticate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ token: token }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    btnText.innerHTML = '<i class="fas fa-check mr-3"></i> Success! Redirecting...';
+                    button.classList.remove('from-accent-500', 'to-accent-600');
+                    button.classList.add('from-green-500', 'to-green-600');
+                    setTimeout(() => {
+                        window.location.href = '/admin/dashboard';
+                    }, 1000);
+                } else {
+                    // Reset button
+                    btnText.innerHTML = originalText;
+                    button.disabled = false;
+                    button.classList.remove('opacity-75', 'cursor-not-allowed');
+                    
+                    // Show error with animation
+                    errorMessage.classList.remove('hidden');
+                    errorMessage.classList.add('animate-fade-in');
+                    
+                    // Focus on input
+                    document.getElementById('token').focus();
+                    document.getElementById('token').select();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                
+                // Reset button
+                btnText.innerHTML = originalText;
+                button.disabled = false;
+                button.classList.remove('opacity-75', 'cursor-not-allowed');
+                
+                // Show generic error
+                errorMessage.querySelector('span').innerText = 'Connection error. Please try again.';
+                errorMessage.classList.remove('hidden');
+                errorMessage.classList.add('animate-fade-in');
+            });
+        });
+
+        // Auto-focus on token input
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('token').focus();
+        });
+    </script>
+</body>
+</html>

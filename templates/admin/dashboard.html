@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | FounDev Studio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        foundev: {
+                            primary: '#00BCD4', // Cyan color
+                            secondary: '#FF5722', // Deep orange
+                            accent: '#8BC34A', // Light green
+                            dark: '#121212',
+                            darker: '#0A0A0A',
+                            lighter: '#1E1E1E',
+                            card: '#1A1A1A',
+                            border: '#333333'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            scrollbar-width: thin;
+            scrollbar-color: #00BCD4 #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: #00BCD4;
+            border-radius: 10px;
+        }
+
+        .grid-pattern {
+            background-image: 
+                linear-gradient(to right, #333333 1px, transparent 1px),
+                linear-gradient(to bottom, #333333 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            transition: all 0.3s;
+        }
+        
+        .content {
+            width: calc(100% - 250px);
+            transition: all 0.3s;
+        }
+        
+        .card-hover {
+            transition: all 0.3s;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 188, 212, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 40;
+                height: 100vh;
+            }
+            
+            .content {
+                width: 100%;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-foundev-dark text-gray-200 min-h-screen">
+    <div class="flex flex-col min-h-screen">
+        <header class="bg-foundev-darker border-b border-foundev-border/30 backdrop-blur-lg sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 py-3">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <div class="w-10 h-10 rounded-md bg-gradient-to-br from-foundev-primary to-foundev-secondary flex items-center justify-center text-white">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <h1 class="text-xl font-bold text-white">
+                            <span class="text-foundev-primary">Foun</span><span class="text-foundev-secondary">Dev</span> <span class="text-gray-400 font-normal text-sm">Admin</span>
+                        </h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-400">Welcome, Admin</span>
+                        <div class="w-8 h-8 rounded-full bg-foundev-lighter flex items-center justify-center text-foundev-primary border border-foundev-border">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <main class="flex-grow grid-pattern">
+            <div class="max-w-7xl mx-auto px-4 py-6">
+                <div class="flex bg-foundev-dark min-h-screen rounded-xl overflow-hidden">
+                    <!-- Sidebar -->
+                    <div class="sidebar bg-foundev-darker border-r border-foundev-border/30 h-screen overflow-y-auto">
+                        <div class="p-5">
+                            <h2 class="text-2xl font-bold mb-8 text-white flex items-center">
+                                <i class="fas fa-server mr-3 text-foundev-primary"></i> Admin Panel
+                            </h2>
+                            <nav>
+                                <ul class="space-y-2">
+                                    <li>
+                                        <a href="#dashboard" class="flex items-center py-3 px-4 rounded-lg hover:bg-foundev-primary/10 transition-colors text-gray-300 hover:text-white" onclick="showTab('dashboard')">
+                                            <i class="fas fa-tachometer-alt mr-3 w-5 text-center text-foundev-primary"></i> Dashboard
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#sites" class="flex items-center py-3 px-4 rounded-lg hover:bg-foundev-primary/10 transition-colors text-gray-300 hover:text-white" onclick="showTab('sites')">
+                                            <i class="fas fa-globe mr-3 w-5 text-center text-foundev-primary"></i> Manage Sites
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#upload" class="flex items-center py-3 px-4 rounded-lg hover:bg-foundev-primary/10 transition-colors text-gray-300 hover:text-white" onclick="showTab('upload')">
+                                            <i class="fas fa-upload mr-3 w-5 text-center text-foundev-primary"></i> Upload Site
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#github" class="flex items-center py-3 px-4 rounded-lg hover:bg-foundev-primary/10 transition-colors text-gray-300 hover:text-white" onclick="showTab('github')">
+                                            <i class="fab fa-github mr-3 w-5 text-center text-foundev-primary"></i> GitHub Integration
+                                        </a>
+                                    </li>
+                                    <li class="mt-10 pt-5 border-t border-foundev-border/30">
+                                        <a href="/logout" class="flex items-center py-3 px-4 rounded-lg hover:bg-foundev-secondary/10 transition-colors text-gray-300 hover:text-white">
+                                            <i class="fas fa-sign-out-alt mr-3 w-5 text-center text-foundev-secondary"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    
+                    <!-- Content -->
+                    <div class="content bg-foundev-dark overflow-auto">
+                        <!-- Mobile menu button -->
+                        <div class="md:hidden bg-foundev-darker border-b border-foundev-border/30 text-white p-4 flex items-center">
+                            <button id="menu-toggle" class="text-white flex items-center">
+                                <i class="fas fa-bars mr-2"></i> Menu
+                            </button>
+                        </div>
+                        
+                        <!-- Dashboard Tab -->
+                        <div id="dashboard" class="p-6 md:p-8 tab-content">
+                            <h1 class="text-3xl font-bold mb-6 text-white flex items-center">
+                                <i class="fas fa-tachometer-alt mr-3 text-foundev-primary"></i> Dashboard Overview
+                            </h1>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6 transition-all duration-300 card-hover">
+                                    <div class="flex items-center">
+                                        <div class="rounded-full bg-foundev-primary/20 p-3 mr-4 text-foundev-primary">
+                                            <i class="fas fa-globe text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-400">Total Sites</h3>
+                                            <p class="text-3xl font-bold text-white" id="total-sites">Loading...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6 transition-all duration-300 card-hover">
+                                    <div class="flex items-center">
+                                        <div class="rounded-full bg-foundev-secondary/20 p-3 mr-4 text-foundev-secondary">
+                                            <i class="fas fa-code-branch text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-400">GitHub Deployments</h3>
+                                            <p class="text-3xl font-bold text-white" id="github-deployments">Loading...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6 transition-all duration-300 card-hover">
+                                    <div class="flex items-center">
+                                        <div class="rounded-full bg-foundev-accent/20 p-3 mr-4 text-foundev-accent">
+                                            <i class="fas fa-cloud-upload-alt text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-lg font-semibold text-gray-400">Zip Uploads</h3>
+                                            <p class="text-3xl font-bold text-white" id="zip-uploads">Loading...</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6">
+                                <h2 class="text-2xl font-bold mb-4 text-white flex items-center">
+                                    <i class="fas fa-history mr-2 text-foundev-primary"></i> Recent Activity
+                                </h2>
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-foundev-border">
+                                        <thead>
+                                            <tr class="bg-foundev-lighter/30">
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Site</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Date</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-foundev-border" id="activity-list">
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-gray-300" colspan="4">Loading activity...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sites Tab -->
+                        <div id="sites" class="p-6 md:p-8 tab-content hidden">
+                            <div class="flex justify-between items-center mb-6">
+                                <h1 class="text-3xl font-bold text-white flex items-center">
+                                    <i class="fas fa-globe mr-3 text-foundev-primary"></i> Manage Sites
+                                </h1>
+                                <button class="bg-foundev-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-lg transition-all flex items-center">
+                                    <i class="fas fa-plus mr-2"></i> Add New Site
+                                </button>
+                            </div>
+                            
+                            <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg">
+                                <div class="overflow-x-auto">
+                                    <table class="min-w-full divide-y divide-foundev-border">
+                                        <thead>
+                                            <tr class="bg-foundev-lighter/30">
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Domain</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Updated</th>
+                                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-foundev-border" id="sites-list">
+                                            <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap text-gray-300" colspan="4">Loading sites...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upload Tab -->
+                        <div id="upload" class="p-6 md:p-8 tab-content hidden">
+                            <h1 class="text-3xl font-bold mb-6 text-white flex items-center">
+                                <i class="fas fa-upload mr-3 text-foundev-primary"></i> Upload Site
+                            </h1>
+                            
+                            <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6">
+                                <form id="upload-form" enctype="multipart/form-data">
+                                    <div class="mb-4">
+                                        <label for="domain" class="block text-sm font-medium text-gray-300 mb-1">Domain Name</label>
+                                        <input type="text" id="domain" name="domain" class="w-full px-3 py-2 bg-foundev-lighter border border-foundev-border rounded-md focus:outline-none focus:ring-2 focus:ring-foundev-primary focus:border-foundev-primary text-white" placeholder="example.com">
+                                    </div>
+                                    
+                                    <div class="mb-6">
+                                        <label for="zipfile" class="block text-sm font-medium text-gray-300 mb-1">ZIP File</label>
+                                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-foundev-border border-dashed rounded-md hover:border-foundev-primary transition-colors">
+                                            <div class="space-y-1 text-center">
+                                                <i class="fas fa-file-archive text-gray-400 text-3xl"></i>
+                                                <div class="flex text-sm text-gray-400">
+                                                    <label for="zipfile" class="relative cursor-pointer bg-transparent rounded-md font-medium text-foundev-primary hover:text-foundev-primary/80 focus-within:outline-none">
+                                                        <span>Upload a file</span>
+                                                        <input id="zipfile" name="zipfile" type="file" accept=".zip" class="sr-only">
+                                                    </label>
+                                                    <p class="pl-1">or drag and drop</p>
+                                                </div>
+                                                <p class="text-xs text-gray-500">ZIP up to 50MB</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <button type="submit" class="w-full bg-foundev-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-lg transition-all flex items-center justify-center">
+                                            <i class="fas fa-upload mr-2"></i> Upload and Deploy
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <!-- GitHub Tab -->
+                        <div id="github" class="p-6 md:p-8 tab-content hidden">
+                            <h1 class="text-3xl font-bold mb-6 text-white flex items-center">
+                                <i class="fab fa-github mr-3 text-foundev-primary"></i> GitHub Integration
+                            </h1>
+                            
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Add New GitHub Site -->
+                                <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6">
+                                    <h2 class="text-2xl font-bold mb-4 text-white flex items-center">
+                                        <i class="fas fa-plus-circle mr-2 text-foundev-primary"></i> Add New GitHub Site
+                                    </h2>
+                                    <form id="github-form">
+                                        <div class="mb-4">
+                                            <label for="gh-domain" class="block text-sm font-medium text-gray-300 mb-1">Domain Name</label>
+                                            <input type="text" id="gh-domain" name="domain" class="w-full px-3 py-2 bg-foundev-lighter border border-foundev-border rounded-md focus:outline-none focus:ring-2 focus:ring-foundev-primary focus:border-foundev-primary text-white" placeholder="example.com">
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label for="gh-repo" class="block text-sm font-medium text-gray-300 mb-1">GitHub Repository URL</label>
+                                            <input type="text" id="gh-repo" name="repo_url" class="w-full px-3 py-2 bg-foundev-lighter border border-foundev-border rounded-md focus:outline-none focus:ring-2 focus:ring-foundev-primary focus:border-foundev-primary text-white" placeholder="https://github.com/username/repository">
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <label for="gh-branch" class="block text-sm font-medium text-gray-300 mb-1">Branch</label>
+                                            <input type="text" id="gh-branch" name="branch" class="w-full px-3 py-2 bg-foundev-lighter border border-foundev-border rounded-md focus:outline-none focus:ring-2 focus:ring-foundev-primary focus:border-foundev-primary text-white" placeholder="main">
+                                        </div>
+                                        
+                                        <div class="mb-6">
+                                            <label for="gh-directory" class="block text-sm font-medium text-gray-300 mb-1">Directory (Optional)</label>
+                                            <input type="text" id="gh-directory" name="directory" class="w-full px-3 py-2 bg-foundev-lighter border border-foundev-border rounded-md focus:outline-none focus:ring-2 focus:ring-foundev-primary focus:border-foundev-primary text-white" placeholder="dist">
+                                            <p class="mt-1 text-xs text-gray-500">Leave empty for repository root</p>
+                                        </div>
+                                        
+                                        <div>
+                                            <button type="submit" class="w-full bg-foundev-primary hover:bg-opacity-90 text-white py-2 px-4 rounded-lg transition-all flex items-center justify-center">
+                                                <i class="fab fa-github mr-2"></i> Connect and Deploy
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                
+                                <!-- GitHub Connected Sites -->
+                                <div class="bg-foundev-card rounded-xl border border-foundev-border/50 shadow-lg p-6">
+                                    <h2 class="text-2xl font-bold mb-4 text-white flex items-center">
+                                        <i class="fas fa-link mr-2 text-foundev-primary"></i> Connected Repositories
+                                    </h2>
+                                    <div class="overflow-y-auto max-h-96">
+                                        <ul class="divide-y divide-foundev-border" id="github-sites">
+                                            <li class="py-4 text-gray-300">Loading GitHub sites...</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="bg-foundev-darker border-t border-foundev-border/30">
+            <div class="max-w-7xl mx-auto px-4 py-4 text-center">
+                <p class="text-gray-500">© 2025 FounDev Studio. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Toggle mobile menu
+        document.getElementById('menu-toggle')?.addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+        
+        // Show tab content
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+            });
+            
+            // Show the selected tab
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            // On mobile, close the sidebar after selecting a tab
+            if (window.innerWidth < 768) {
+                document.querySelector('.sidebar').classList.remove('active');
+            }
+            
+            // Load data for the selected tab
+            if (tabId === 'sites') {
+                loadSites();
+            } else if (tabId === 'github') {
+                loadGitHubSites();
+            } else if (tabId === 'dashboard') {
+                loadDashboardData();
+            }
+        }
+        
+        // Load sites data
+        function loadSites() {
+            fetch('/api/sites')
+                .then(response => response.json())
+                .then(data => {
+                    const sitesList = document.getElementById('sites-list');
+                    if (data.sites && data.sites.length > 0) {
+                        sitesList.innerHTML = data.sites.map(site => `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${site.domain}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${site.type}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${site.updated_at}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex space-x-3">
+                                        <button class="text-foundev-primary hover:text-foundev-primary/80" onclick="viewSite('${site.domain}')" title="View Site">
+                                            <i class="fas fa-external-link-alt"></i>
+                                        </button>
+                                        <button class="text-foundev-accent hover:text-foundev-accent/80" onclick="deploySite('${site.domain}')" title="Redeploy">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                        <button class="text-foundev-secondary hover:text-foundev-secondary/80" onclick="deleteSite('${site.domain}')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        sitesList.innerHTML = `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-gray-400" colspan="4">No sites found</td>
+                            </tr>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading sites:', error);
+                    document.getElementById('sites-list').innerHTML = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-foundev-secondary" colspan="4">Error loading sites</td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        // Load GitHub sites
+        function loadGitHubSites() {
+            fetch('/api/github-sites')
+                .then(response => response.json())
+                .then(data => {
+                    const githubSites = document.getElementById('github-sites');
+                    if (data.sites && data.sites.length > 0) {
+                        githubSites.innerHTML = data.sites.map(site => `
+                            <li class="py-4">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-300">${site.domain}</h3>
+                                        <p class="text-sm text-gray-500">${site.repo_url} (${site.branch})</p>
+                                    </div>
+                                    <div class="flex space-x-3">
+                                        <button class="text-foundev-accent hover:text-foundev-accent/80" onclick="deployGitHubSite('${site.domain}')" title="Redeploy">
+                                            <i class="fas fa-sync-alt"></i>
+                                        </button>
+                                        <button class="text-foundev-secondary hover:text-foundev-secondary/80" onclick="deleteGitHubSite('${site.domain}')" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        `).join('');
+                    } else {
+                        githubSites.innerHTML = `
+                            <li class="py-4 text-center text-gray-400">No GitHub sites connected</li>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading GitHub sites:', error);
+                    document.getElementById('github-sites').innerHTML = `
+                        <li class="py-4 text-center text-foundev-secondary">Error loading GitHub sites</li>
+                    `;
+                });
+        }
+        
+        // Load dashboard data
+        function loadDashboardData() {
+            fetch('/api/dashboard')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-sites').textContent = data.total_sites || 0;
+                    document.getElementById('github-deployments').textContent = data.github_deployments || 0;
+                    document.getElementById('zip-uploads').textContent = data.zip_uploads || 0;
+                    
+                    const activityList = document.getElementById('activity-list');
+                    if (data.recent_activity && data.recent_activity.length > 0) {
+                        activityList.innerHTML = data.recent_activity.map(activity => `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${activity.site}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${activity.type}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">${activity.date}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${activity.status === 'success' 
+                                      ? 'bg-foundev-accent/20 text-foundev-accent' 
+                                      : 'bg-foundev-secondary/20 text-foundev-secondary'}">
+                                        ${activity.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('');
+                    } else {
+                        activityList.innerHTML = `
+                            <tr>
+                                <td class="px-6 py-4 whitespace-nowrap text-center text-gray-400" colspan="4">No recent activity</td>
+                            </tr>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading dashboard data:', error);
+                    document.getElementById('total-sites').textContent = 'Error';
+                    document.getElementById('github-deployments').textContent = 'Error';
+                    document.getElementById('zip-uploads').textContent = 'Error';
+                    document.getElementById('activity-list').innerHTML = `
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-foundev-secondary" colspan="4">Error loading activity</td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        // Upload form handler
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('domain', document.getElementById('domain').value);
+            formData.append('zipfile', document.getElementById('zipfile').files[0]);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.text())
+            .then(result => {
+                alert(result);
+                document.getElementById('upload-form').reset();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Upload failed: ' + error);
+            });
+        });
+        
+        // GitHub form handler
+        document.getElementById('github-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                domain: document.getElementById('gh-domain').value,
+                repo_url: document.getElementById('gh-repo').value,
+                branch: document.getElementById('gh-branch').value,
+                directory: document.getElementById('gh-directory').value
+            };
+            
+            fetch('/api/github-deploy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => response.json())
+            .then(result => {
+                alert(result.message || 'Deployment successful');
+                document.getElementById('github-form').reset();
+                loadGitHubSites();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('GitHub deployment failed: ' + error);
+            });
+        });
+        
+        // Site actions
+        function viewSite(domain) {
+            window.open(`/site/${domain}/`, '_blank');
+        }
+        
+        function deploySite(domain) {
+            fetch(`/api/deploy/${domain}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message || 'Deployment successful');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Deployment failed: ' + error);
+                });
+        }
+        
+        function deleteSite(domain) {
+            if (confirm(`Are you sure you want to delete site ${domain}?`)) {
+                fetch(`/api/site/${domain}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(result => {
+                        alert(result.message || 'Site deleted successfully');
+                        loadSites();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Delete failed: ' + error);
+                    });
+            }
+        }
+        
+        // GitHub site actions
+        function deployGitHubSite(domain) {
+            fetch(`/api/github-deploy/${domain}`, { method: 'POST' })
+                .then(response => response.json())
+                .then(result => {
+                    alert(result.message || 'GitHub deployment successful');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('GitHub deployment failed: ' + error);
+                });
+        }
+        
+        function deleteGitHubSite(domain) {
+            if (confirm(`Are you sure you want to delete GitHub site ${domain}?`)) {
+                fetch(`/api/github-site/${domain}`, { method: 'DELETE' })
+                    .then(response => response.json())
+                    .then(result => {
+                        alert(result.message || 'GitHub site deleted successfully');
+                        loadGitHubSites();
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Delete failed: ' + error);
+                    });
+            }
+        }
+        
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', function() {
+            showTab('dashboard');
+        });
+    </script>
+</body>
+</html>

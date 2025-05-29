@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FounDev Studio - Modern Static Site Hosting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#10b981',
+                        accent: '#f59e0b',
+                        dark: '#0f172a',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 0 20px #3b82f6; }
+            to { box-shadow: 0 0 30px #3b82f6, 0 0 40px #3b82f6; }
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white overflow-x-hidden">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <div class="text-2xl font-bold text-primary">
+                        <i class="fas fa-cloud mr-2"></i>FounDev
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-8">
+                        <a href="#home" class="text-gray-300 hover:text-primary transition-colors">Home</a>
+                        <a href="#about" class="text-gray-300 hover:text-primary transition-colors">About</a>
+                        <a href="#features" class="text-gray-300 hover:text-primary transition-colors">Features</a>
+                        <a href="#pricing" class="text-gray-300 hover:text-primary transition-colors">Pricing</a>
+                        <a href="#testimonials" class="text-gray-300 hover:text-primary transition-colors">Reviews</a>
+                        <a href="#contact" class="text-gray-300 hover:text-primary transition-colors">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="bg-primary hover:bg-blue-600 text-white px-6 py-2 rounded-full transition-colors">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center gradient-bg relative overflow-hidden">
+        <!-- Animated Background Elements -->
+        <div class="absolute inset-0">
+            <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl animate-float"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-secondary/20 rounded-full blur-3xl animate-float" style="animation-delay: -3s;"></div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                    Deploy Your Sites in 
+                    <span class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Seconds</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Lightning-fast static site hosting with global CDN, GitHub integration, and zero configuration required.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+                    <a href="/login" class="bg-primary hover:bg-blue-600 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all transform hover:scale-105 shadow-2xl">
+                        <i class="fas fa-rocket mr-2"></i>Start Free Trial
+                    </a>
+                    <a href="#features" class="border-2 border-gray-600 hover:border-primary text-white px-8 py-4 rounded-full text-lg font-semibold transition-all">
+                        <i class="fas fa-play mr-2"></i>See How It Works
+                    </a>
+                </div>
+                
+                <!-- Hero Visual -->
+                <div class="relative animate-float">
+                    <div class="glass rounded-2xl p-8 max-w-4xl mx-auto">
+                        <div class="flex items-center space-x-2 mb-4">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                        <div class="bg-black rounded-lg p-6 font-mono text-left text-sm">
+                            <div class="text-green-400">$ foundev deploy</div>
+                            <div class="text-gray-400">Uploading files... 100%</div>
+                            <div class="text-gray-400">Building site...</div>
+                            <div class="text-green-400">✓ Deployed successfully!</div>
+                            <div class="text-primary">🌍 https://yoursite.foundev.studio</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Why Choose FounDev?</h2>
+                <p class="text-xl text-gray-400 max-w-3xl mx-auto">We're not just another hosting provider. We're developers building for developers.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-bolt text-2xl text-primary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
+                    <p class="text-gray-400">Global CDN ensures your sites load in under 100ms worldwide</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-secondary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fab fa-github text-2xl text-secondary"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">GitHub Integration</h3>
+                    <p class="text-gray-400">Push to deploy. Automatic builds from your favorite repositories</p>
+                </div>
+                
+                <div class="text-center p-6">
+                    <div class="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-2xl text-accent"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Enterprise Security</h3>
+                    <p class="text-gray-400">DDoS protection, SSL certificates, and advanced security features included</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Powerful Features</h2>
+                <p class="text-xl text-gray-400">Everything you need to deploy and manage static websites</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-upload text-3xl text-primary mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Drag & Drop Deploy</h3>
+                    <p class="text-gray-400">Simply drag your files or ZIP archives to deploy instantly</p>
+                </div>
+                
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-globe text-3xl text-secondary mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Custom Domains</h3>
+                    <p class="text-gray-400">Use your own domain with automatic SSL certificate provisioning</p>
+                </div>
+                
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-chart-line text-3xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Real-time Analytics</h3>
+                    <p class="text-gray-400">Monitor traffic, performance, and user engagement in real-time</p>
+                </div>
+                
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-code-branch text-3xl text-primary mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Git Integration</h3>
+                    <p class="text-gray-400">Connect GitHub, GitLab, or Bitbucket for automatic deployments</p>
+                </div>
+                
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-compress-arrows-alt text-3xl text-secondary mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">Asset Optimization</h3>
+                    <p class="text-gray-400">Automatic compression and optimization for faster loading</p>
+                </div>
+                
+                <div class="glass rounded-xl p-6 hover:scale-105 transition-transform">
+                    <i class="fas fa-headset text-3xl text-accent mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-2">24/7 Support</h3>
+                    <p class="text-gray-400">Expert support team available around the clock</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="py-20 bg-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">How It Works</h2>
+                <p class="text-xl text-gray-400">Deploy your site in 3 simple steps</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center relative">
+                    <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">1</div>
+                    <h3 class="text-xl font-semibold mb-2">Connect Repository</h3>
+                    <p class="text-gray-400">Link your GitHub, GitLab, or upload files directly</p>
+                    <div class="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-primary to-transparent"></div>
+                </div>
+                
+                <div class="text-center relative">
+                    <div class="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">2</div>
+                    <h3 class="text-xl font-semibold mb-2">Configure Settings</h3>
+                    <p class="text-gray-400">Set up your domain, build commands, and environment variables</p>
+                    <div class="hidden md:block absolute top-10 left-full w-full h-0.5 bg-gradient-to-r from-secondary to-transparent"></div>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6 text-2xl font-bold">3</div>
+                    <h3 class="text-xl font-semibold mb-2">Go Live</h3>
+                    <p class="text-gray-400">Your site is deployed globally and ready to receive visitors</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Simple Pricing</h2>
+                <p class="text-xl text-gray-400">Choose the plan that fits your needs</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Free Plan -->
+                <div class="glass rounded-xl p-8 hover:scale-105 transition-transform">
+                    <h3 class="text-2xl font-bold mb-2">Free</h3>
+                    <div class="text-4xl font-bold text-primary mb-6">$0<span class="text-lg text-gray-400">/month</span></div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 1 Website</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 100GB Bandwidth</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> GitHub Integration</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Global CDN</li>
+                    </ul>
+                    <a href="/login" class="block w-full bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg text-center transition-colors">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Pro Plan -->
+                <div class="glass rounded-xl p-8 border-2 border-primary transform scale-105 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-primary text-white px-4 py-1 rounded-full text-sm">
+                        Most Popular
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Pro</h3>
+                    <div class="text-4xl font-bold text-primary mb-6">$12<span class="text-lg text-gray-400">/month</span></div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 10 Websites</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 1TB Bandwidth</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Custom Domains</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Priority Support</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Advanced Analytics</li>
+                    </ul>
+                    <a href="/login" class="block w-full bg-primary hover:bg-blue-600 text-white py-3 rounded-lg text-center transition-colors">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Enterprise Plan -->
+                <div class="glass rounded-xl p-8 hover:scale-105 transition-transform">
+                    <h3 class="text-2xl font-bold mb-2">Enterprise</h3>
+                    <div class="text-4xl font-bold text-primary mb-6">$39<span class="text-lg text-gray-400">/month</span></div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Unlimited Websites</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 5TB Bandwidth</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Team Collaboration</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 24/7 Support</li>
+                        <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Enterprise Security</li>
+                    </ul>
+                    <a href="/login" class="block w-full bg-gray-600 hover:bg-gray-500 text-white py-3 rounded-lg text-center transition-colors">
+                        Get Started
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="py-20 bg-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">What Developers Say</h2>
+                <p class="text-xl text-gray-400">Join thousands of satisfied developers</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=64&h=64&fit=crop&crop=face&auto=format" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <div class="font-semibold">Alex Johnson</div>
+                            <div class="text-gray-400 text-sm">Frontend Developer</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"FounDev has completely transformed our deployment workflow. What used to take hours now happens in seconds!"</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <div class="glass rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1494790108755-2616b612b37c?w=64&h=64&fit=crop&crop=face&auto=format" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <div class="font-semibold">Sarah Chen</div>
+                            <div class="text-gray-400 text-sm">Tech Lead</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"The GitHub integration is seamless. Our team can focus on building instead of worrying about deployments."</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+                
+                <div class="glass rounded-xl p-6">
+                    <div class="flex items-center mb-4">
+                        <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face&auto=format" alt="User" class="w-12 h-12 rounded-full mr-4">
+                        <div>
+                            <div class="font-semibold">Mike Rodriguez</div>
+                            <div class="text-gray-400 text-sm">Startup Founder</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300">"Best hosting service I've used. Fast, reliable, and the support team is incredibly helpful."</p>
+                    <div class="flex text-yellow-400 mt-4">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 bg-slate-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
+                <p class="text-xl text-gray-400">Have questions? We're here to help</p>
+            </div>
+            
+            <div class="max-w-4xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-6">Contact Information</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center">
+                                <i class="fas fa-envelope text-primary mr-4"></i>
+                                <span>support@foundev.studio</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-phone text-primary mr-4"></i>
+                                <span>+1 (555) 123-4567</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-map-marker-alt text-primary mr-4"></i>
+                                <span>San Francisco, CA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-primary rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="glass rounded-xl p-8">
+                        <form class="space-y-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium mb-2">Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 bg-slate-800 border border-gray-600 rounded-lg focus:outline-none focus:border-primary">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 bg-slate-800 border border-gray-600 rounded-lg focus:outline-none focus:border-primary">
+                            </div>
+                            <div>
+                                <label for="message" class="block text-sm font-medium mb-2">Message</label>
+                                <textarea id="message" rows="4" class="w-full px-4 py-2 bg-slate-800 border border-gray-600 rounded-lg focus:outline-none focus:border-primary"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-primary hover:bg-blue-600 text-white py-3 rounded-lg transition-colors">
+                                Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <div class="text-2xl font-bold text-primary mb-4">
+                        <i class="fas fa-cloud mr-2"></i>FounDev
+                    </div>
+                    <p class="text-gray-400">Modern static site hosting for developers who demand speed, reliability, and simplicity.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#features" class="hover:text-primary transition-colors">Features</a></li>
+                        <li><a href="#pricing" class="hover:text-primary transition-colors">Pricing</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Documentation</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">API</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#about" class="hover:text-primary transition-colors">About</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Blog</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Careers</a></li>
+                        <li><a href="#contact" class="hover:text-primary transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-primary transition-colors">Help Center</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Community</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Status</a></li>
+                        <li><a href="#" class="hover:text-primary transition-colors">Security</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400">&copy; 2024 FounDev Studio. All rights reserved.</p>
+                <div class="flex space-x-6 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-primary transition-colors">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth Scrolling Script -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

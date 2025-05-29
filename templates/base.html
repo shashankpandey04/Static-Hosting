@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FounDev Studio - Static Site Hosting{% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        foundev: {
+                            primary: '#00BCD4', // Cyan color
+                            secondary: '#FF5722', // Deep orange
+                            accent: '#8BC34A', // Light green
+                            dark: '#121212',
+                            darker: '#0A0A0A',
+                            lighter: '#1E1E1E',
+                            card: '#1A1A1A',
+                            border: '#333333'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            background-color: #121212;
+            font-family: 'Poppins', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: #00BCD4 #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: #00BCD4;
+            border-radius: 10px;
+        }
+
+        .animated-gradient {
+            background: linear-gradient(to right, #00BCD4, #FF5722, #8BC34A, #00BCD4);
+            background-size: 300% 300%;
+            animation: gradient 8s linear infinite;
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 188, 212, 0.5);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 188, 212, 0.3);
+        }
+        
+        /* Grid pattern background */
+        .grid-pattern {
+            background-image: 
+                linear-gradient(to right, #333333 1px, transparent 1px),
+                linear-gradient(to bottom, #333333 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body class="bg-foundev-dark text-gray-200 min-h-screen flex flex-col antialiased">
+    <!-- Header -->
+    <header class="bg-foundev-darker border-b border-foundev-border/30 backdrop-blur-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between">
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-bold flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-md bg-gradient-to-br from-foundev-primary to-foundev-secondary flex items-center justify-center text-white">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <span class="text-white font-bold">
+                        <span class="text-foundev-primary">Foun</span><span class="text-foundev-secondary">Dev</span> <span class="text-gray-400 font-normal text-sm">Studio</span>
+                    </span>
+                </a>
+            </div>
+            <nav class="flex space-x-6 items-center">
+                <a href="/" class="text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-foundev-primary hover:after:w-full after:transition-all">
+                    Home
+                </a>
+                <a href="#features" class="text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-foundev-primary hover:after:w-full after:transition-all">
+                    Features
+                </a>
+                <a href="#pricing" class="text-gray-300 hover:text-white transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-0.5 after:w-0 after:bg-foundev-primary hover:after:w-full after:transition-all">
+                    Pricing
+                </a>
+                <a href="/login" class="px-4 py-1.5 bg-foundev-primary rounded-md hover:bg-opacity-90 transition-opacity text-white">
+                    Login
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-foundev-darker border-t border-foundev-border/30 mt-auto">
+        <div class="container mx-auto px-4 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-8 h-8 rounded-md bg-gradient-to-br from-foundev-primary to-foundev-secondary flex items-center justify-center text-white">
+                            <i class="fas fa-cube text-sm"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">
+                            <span class="text-foundev-primary">Foun</span><span class="text-foundev-secondary">Dev</span>
+                        </h3>
+                    </div>
+                    <p class="text-sm text-gray-400">Next-generation static site hosting for modern developers. Build, deploy, and scale with ease.</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Quick Links</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="/" class="text-gray-400 hover:text-foundev-primary transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-xs"></i> Home
+                        </a></li>
+                        <li><a href="#features" class="text-gray-400 hover:text-foundev-primary transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-xs"></i> Features
+                        </a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-foundev-primary transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-xs"></i> Pricing
+                        </a></li>
+                        <li><a href="/login" class="text-gray-400 hover:text-foundev-primary transition-colors flex items-center gap-2">
+                            <i class="fas fa-chevron-right text-xs"></i> Admin Panel
+                        </a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3 text-white">Connect with Us</h3>
+                    <div class="flex space-x-4 text-xl">
+                        <a href="#" class="w-10 h-10 rounded-md bg-foundev-lighter flex items-center justify-center text-gray-400 hover:text-white hover:bg-foundev-primary/20 transition-all">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-md bg-foundev-lighter flex items-center justify-center text-gray-400 hover:text-white hover:bg-foundev-primary/20 transition-all">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-md bg-foundev-lighter flex items-center justify-center text-gray-400 hover:text-white hover:bg-foundev-primary/20 transition-all">
+                            <i class="fab fa-discord"></i>
+                        </a>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-400">
+                        <i class="fas fa-envelope mr-2"></i> contact@foundev.studio
+                    </p>
+                </div>
+            </div>
+            <div class="border-t border-foundev-border/30 mt-6 pt-6 text-center text-sm text-gray-500">
+                <p>&copy; 2025 FounDev Studio. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

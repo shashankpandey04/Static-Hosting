@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | FounDev Studio</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        foundev: {
+                            primary: '#00BCD4', // Cyan color
+                            secondary: '#FF5722', // Deep orange
+                            accent: '#8BC34A', // Light green
+                            dark: '#121212',
+                            darker: '#0A0A0A',
+                            lighter: '#1E1E1E',
+                            card: '#1A1A1A',
+                            border: '#333333'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'gradient': 'gradient 8s linear infinite',
+                        'float': 'float 6s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        gradient: {
+                            '0%, 100%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'left center'
+                            },
+                            '50%': {
+                                'background-size': '200% 200%',
+                                'background-position': 'right center'
+                            }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #121212;
+            scrollbar-width: thin;
+            scrollbar-color: #00BCD4 #1E1E1E;
+            overflow-x: hidden;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1E1E1E;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background-color: #00BCD4;
+            border-radius: 10px;
+        }
+        
+        #scene-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+        }
+        
+        .text-glow {
+            text-shadow: 0 0 15px rgba(0, 188, 212, 0.6);
+        }
+        
+        .btn-glow {
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-glow:hover {
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.6);
+        }
+        
+        .grid-pattern {
+            background-image: 
+                linear-gradient(to right, rgba(51, 51, 51, 0.3) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(51, 51, 51, 0.3) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body class="bg-foundev-dark grid-pattern min-h-screen flex flex-col">
+    <!-- 3D Scene Container -->
+    <div id="scene-container"></div>
+    
+    <div class="relative z-10 container mx-auto px-4 py-8 flex flex-col min-h-screen">
+        <!-- Header -->
+        <header class="py-4">
+            <div class="flex items-center">
+                <a href="/" class="text-2xl font-bold flex items-center gap-2">
+                    <div class="w-10 h-10 rounded-md bg-gradient-to-br from-foundev-primary to-foundev-secondary flex items-center justify-center text-white">
+                        <i class="fas fa-cube"></i>
+                    </div>
+                    <span class="text-white font-bold">
+                        <span class="text-foundev-primary">Foun</span><span class="text-foundev-secondary">Dev</span> <span class="text-gray-400 font-normal text-sm">Studio</span>
+                    </span>
+                </a>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="flex-grow flex flex-col items-center justify-center text-center p-4">
+            <div class="relative">
+                <h1 class="text-9xl font-bold text-foundev-primary text-glow opacity-90 mb-2">404</h1>
+                <div class="absolute -bottom-3 w-full h-4 bg-foundev-primary/20 blur-xl"></div>
+            </div>
+            
+            <h2 class="text-3xl md:text-4xl font-bold text-white mt-8 mb-4">Site Not Found</h2>
+            
+            <p class="text-xl text-gray-400 max-w-lg mb-8">
+                The site you're trying to visit doesn't exist or has been removed.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="/" class="btn-glow bg-foundev-primary hover:bg-foundev-primary/90 text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center">
+                    <i class="fas fa-home mr-2"></i> Return to Home
+                </a>
+                
+                <button onclick="history.back()" class="border border-foundev-border hover:border-foundev-primary text-white font-medium py-3 px-6 rounded-lg transition-all flex items-center justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Go Back
+                </button>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="py-4 text-center text-gray-500 text-sm">
+            <p>&copy; 2025 FounDev Studio. All rights reserved.</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Three.js 3D animation
+        let scene, camera, renderer, clock;
+        let cubes = [];
+        let isInitialized = false;
+        
+        function init() {
+            if (isInitialized) return;
+            isInitialized = true;
+            
+            // Setup scene
+            scene = new THREE.Scene();
+            
+            // Setup camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 5;
+            
+            // Setup renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0); // Transparent background
+            document.getElementById('scene-container').appendChild(renderer.domElement);
+            
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            // Add directional light
+            const directionalLight = new THREE.DirectionalLight(0x00BCD4, 1); // Cyan color
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Create cubes with error-like messages
+            createCubes();
+            
+            // Initialize clock for animation
+            clock = new THREE.Clock();
+            
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize);
+            
+            // Start animation
+            animate();
+            
+            // Add GSAP animations
+            animateWithGSAP();
+        }
+        
+        function createCubes() {
+            const totalCubes = 40;
+            const spread = 10;
+            
+            const materials = [
+                new THREE.MeshPhongMaterial({ color: 0x00BCD4, transparent: true, opacity: 0.8 }), // Primary color
+                new THREE.MeshPhongMaterial({ color: 0xFF5722, transparent: true, opacity: 0.8 }), // Secondary color
+                new THREE.MeshPhongMaterial({ color: 0x8BC34A, transparent: true, opacity: 0.8 })  // Accent color
+            ];
+            
+            for (let i = 0; i < totalCubes; i++) {
+                // Random size between 0.1 and 0.5
+                const size = Math.random() * 0.4 + 0.1;
+                
+                // Create cube geometry
+                const geometry = new THREE.BoxGeometry(size, size, size);
+                
+                // Select random material
+                const material = materials[Math.floor(Math.random() * materials.length)];
+                
+                // Create mesh
+                const cube = new THREE.Mesh(geometry, material);
+                
+                // Random position
+                cube.position.x = (Math.random() - 0.5) * spread;
+                cube.position.y = (Math.random() - 0.5) * spread;
+                cube.position.z = (Math.random() - 0.5) * spread;
+                
+                // Random rotation
+                cube.rotation.x = Math.random() * Math.PI;
+                cube.rotation.y = Math.random() * Math.PI;
+                
+                // Store original position for animation
+                cube.userData = {
+                    originalPosition: cube.position.clone(),
+                    rotationSpeed: {
+                        x: (Math.random() - 0.5) * 0.01,
+                        y: (Math.random() - 0.5) * 0.01
+                    }
+                };
+                
+                // Add to scene and cubes array
+                scene.add(cube);
+                cubes.push(cube);
+            }
+        }
+        
+        function animateWithGSAP() {
+            // Animate each cube with GSAP
+            cubes.forEach((cube, index) => {
+                // Create timeline for this cube
+                const tl = gsap.timeline({
+                    repeat: -1,
+                    yoyo: true,
+                    delay: index * 0.1
+                });
+                
+                // Animate position
+                tl.to(cube.position, {
+                    x: cube.userData.originalPosition.x + (Math.random() - 0.5) * 2,
+                    y: cube.userData.originalPosition.y + (Math.random() - 0.5) * 2,
+                    z: cube.userData.originalPosition.z + (Math.random() - 0.5) * 2,
+                    duration: 4 + Math.random() * 4,
+                    ease: "power1.inOut"
+                });
+                
+                // Animate opacity
+                gsap.to(cube.material, {
+                    opacity: 0.2 + Math.random() * 0.6,
+                    duration: 2 + Math.random() * 3,
+                    repeat: -1,
+                    yoyo: true,
+                    ease: "sine.inOut"
+                });
+            });
+            
+            // Animate camera
+            gsap.to(camera.position, {
+                z: 6,
+                duration: 10,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+            
+            gsap.to(camera.rotation, {
+                x: 0.1,
+                y: 0.1,
+                duration: 15,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        }
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // Rotate cubes
+            cubes.forEach(cube => {
+                cube.rotation.x += cube.userData.rotationSpeed.x;
+                cube.rotation.y += cube.userData.rotationSpeed.y;
+            });
+            
+            renderer.render(scene, camera);
+        }
+        
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // Initialize the 3D scene
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
